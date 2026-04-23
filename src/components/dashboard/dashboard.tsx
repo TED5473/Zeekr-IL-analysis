@@ -8,6 +8,7 @@ import { DataTable } from "@/components/dashboard/data-table";
 import { FiltersSidebar } from "@/components/dashboard/filters-sidebar";
 import { InsightsPanel } from "@/components/dashboard/insights-panel";
 import { ModelDetailModal } from "@/components/dashboard/model-detail-modal";
+import { ReportTables } from "@/components/dashboard/report-tables";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,18 +22,22 @@ import {
 import {
   DATA_PERIOD_LABEL,
   DATA_UPDATED_AT,
+  SALES_PERIOD_OPTIONS,
   bubbleModels,
+  scaleAnnualDeliveries,
   type CarModel,
+  type SalesPeriod,
 } from "@/lib/data";
 
-function toCsv(models: CarModel[]) {
+function toCsv(models: CarModel[], salesPeriod: SalesPeriod) {
   const headers = [
     "brand",
     "model",
     "fullName",
     "length_mm",
     "base_price_ils",
-    "sales_volume",
+    `sales_${salesPeriod}`,
+    "sales_year",
     "body_type",
     "powertrain",
     "cartube_catalog_url",
@@ -46,6 +51,7 @@ function toCsv(models: CarModel[]) {
       model.fullName,
       model.length_mm,
       model.base_price_ils,
+      scaleAnnualDeliveries(model.sales_volume, salesPeriod),
       model.sales_volume,
       model.body_type ?? "",
       model.powertrain ?? "",
@@ -114,13 +120,23 @@ export function Dashboard() {
   const [viewMode, setViewMode] = useState<"chart" | "table">("chart");
   const [insightsCollapsed, setInsightsCollapsed] = useState(false);
   const [chartRevision, setChartRevision] = useState(0);
+  const [salesPeriod, setSalesPeriod] = useState<SalesPeriod>("year");
 
   const selectedBrandSet = useMemo(() => new Set(selectedBrands), [selectedBrands]);
+
+  const modelsForPeriod = useMemo(
+    () =>
+      bubbleModels.map((model) => ({
+        ...model,
+        sales_volume: scaleAnnualDeliveries(model.sales_volume, salesPeriod),
+      })),
+    [salesPeriod],
+  );
 
   const filteredModels = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
-    return bubbleModels.filter((model) => {
+    return modelsForPeriod.filter((model) => {
       const inBrand = selectedBrands.includes(model.brand);
       const inBodyType =
         selectedBodyTypes.length === 0 ||
@@ -138,6 +154,7 @@ export function Dashboard() {
       return inBrand && inBodyType && inPowertrain && inPrice && inSales && inSearch;
     });
   }, [
+    modelsForPeriod,
     priceRange,
     salesRange,
     searchTerm,
@@ -147,7 +164,7 @@ export function Dashboard() {
   ]);
 
   const handleToggle = (
-    selected: string[],
+    _selected: string[],
     setSelected: React.Dispatch<React.SetStateAction<string[]>>,
     value: string,
   ) => {
@@ -171,7 +188,7 @@ export function Dashboard() {
   };
 
   const exportCsv = () => {
-    downloadCsv("israel-car-bubble-analyzer.csv", toCsv(filteredModels));
+    downloadCsv("israel-car-bubble-analyzer.csv", toCsv(filteredModels, salesPeriod));
   };
 
   return (
@@ -260,6 +277,21 @@ export function Dashboard() {
                 </Select>
               </div>
 
+              <div className="min-w-[170px]">
+                <Select value={salesPeriod} onValueChange={(value) => setSalesPeriod(value as SalesPeriod)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sales period" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SALES_PERIOD_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <Button
                 variant="outline"
                 size="sm"
@@ -303,6 +335,8 @@ export function Dashboard() {
               <DataTable models={filteredModels} onRowClick={setSelectedModel} />
             )}
           </div>
+
+          <ReportTables period={salesPeriod} />
         </main>
 
         <aside className="xl:sticky xl:top-24 xl:h-fit">
