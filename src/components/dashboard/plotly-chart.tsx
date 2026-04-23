@@ -10,18 +10,18 @@ import type { CarModel } from "@/lib/data";
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
 const FALLBACK_COLORS = [
-  "#0071e3",
-  "#34c759",
-  "#ff9500",
-  "#ffd60a",
-  "#5856d6",
-  "#64d2ff",
-  "#ff2d55",
-  "#30b0c7",
-  "#af52de",
-  "#5ac8fa",
-  "#ff9f0a",
-  "#00c7be",
+  "#1f77b4",
+  "#d62728",
+  "#2ca02c",
+  "#9467bd",
+  "#ff7f0e",
+  "#17becf",
+  "#e377c2",
+  "#8c564b",
+  "#bcbd22",
+  "#7f7f7f",
+  "#003f5c",
+  "#ffa600",
 ];
 
 interface BubbleChartProps {
@@ -52,15 +52,28 @@ export function BubbleChart({
     return map;
   }, [selectedBrandSet]);
 
+  const salesScale = useMemo(() => {
+    const values = models.map((model) => model.sales_volume);
+    const minSales = Math.min(...values, 1);
+    const maxSales = Math.max(...values, 1);
+
+    const minDiameter = 14 * bubbleScale;
+    const maxDiameter = 76 * bubbleScale;
+
+    const diameterForSales = (sales: number) => {
+      if (maxSales === minSales) return (minDiameter + maxDiameter) / 2;
+      const normalized = (sales - minSales) / (maxSales - minSales);
+      // Ease-out curve so high-volume models stand out more clearly.
+      const emphasized = Math.pow(normalized, 0.72);
+      return minDiameter + emphasized * (maxDiameter - minDiameter);
+    };
+
+    return { diameterForSales };
+  }, [models, bubbleScale]);
+
   const traces = useMemo<Data[]>(() => {
     return Array.from(selectedBrandSet).map((brand) => {
       const brandModels = models.filter((model) => model.brand === brand);
-
-      const salesValues = brandModels.map((model) => model.sales_volume);
-      const maxSales = Math.max(...salesValues, 1);
-      const minSales = Math.min(...salesValues, 1);
-      const sizeRef = (2 * maxSales) / Math.pow(70 * bubbleScale, 2);
-      const sizeMin = Math.max(10, 10 + (minSales / maxSales) * 6);
 
       return {
         type: "scatter",
@@ -75,15 +88,13 @@ export function BubbleChart({
           size: 11,
         },
         marker: {
-          sizemode: "area",
-          sizeref: sizeRef,
-          sizemin: sizeMin,
-          size: brandModels.map((model) => model.sales_volume),
+          sizemode: "diameter",
+          size: brandModels.map((model) => salesScale.diameterForSales(model.sales_volume)),
           color: brandColorMap.get(brand),
-          opacity: 0.86,
+          opacity: 0.95,
           line: {
-            width: 1,
-            color: "rgba(255,255,255,0.9)",
+            width: 2,
+            color: "rgba(17,17,17,0.35)",
           },
         },
         hovertext: brandModels.map(
@@ -99,7 +110,7 @@ export function BubbleChart({
         hovertemplate: "%{hovertext}<extra></extra>",
       } satisfies Data;
     });
-  }, [brandColorMap, models, selectedBrandSet, showLabels, bubbleScale]);
+  }, [brandColorMap, models, selectedBrandSet, showLabels, salesScale]);
 
   const layout: Partial<Layout> = {
     autosize: true,
