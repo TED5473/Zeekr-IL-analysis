@@ -44,7 +44,7 @@ function MultiSelectList({
 }) {
   return (
     <div className="space-y-2">
-      <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">{title}</p>
+      <p className="text-xs font-medium uppercase tracking-wide text-[#6e6e73]">{title}</p>
       <div className="max-h-32 space-y-2 overflow-auto pr-1">
         {items.map((item) => {
           const id = `${title}-${item}`;
@@ -52,7 +52,7 @@ function MultiSelectList({
             <label
               key={item}
               htmlFor={id}
-              className="flex cursor-pointer items-center gap-2 text-sm text-zinc-200"
+              className="flex cursor-pointer items-center gap-2 text-sm text-[#1d1d1f]"
             >
               <Checkbox
                 id={id}
@@ -98,9 +98,9 @@ export function FiltersSidebar({
       </CardHeader>
       <CardContent className="space-y-5">
         <div className="space-y-2">
-          <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">Search</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-[#6e6e73]">Search</p>
           <div className="relative">
-            <Search className="pointer-events-none absolute top-2.5 left-2.5 h-4 w-4 text-zinc-500" />
+            <Search className="pointer-events-none absolute top-2.5 left-2.5 h-4 w-4 text-[#8e8e93]" />
             <Input
               value={searchTerm}
               onChange={(event) => onSearchTermChange(event.target.value)}
@@ -132,31 +132,31 @@ export function FiltersSidebar({
         />
 
         <div className="space-y-2">
-          <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">Price range</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-[#6e6e73]">Price range</p>
           <Slider
             value={priceRange}
             min={130000}
-            max={300000}
+            max={350000}
             step={1000}
             onValueChange={(value) => onPriceRangeChange(value as [number, number])}
           />
-          <p className="text-xs text-zinc-400">
+          <p className="text-xs text-[#6e6e73]">
             {formatNumber(priceRange[0])} - {formatNumber(priceRange[1])} ILS
           </p>
         </div>
 
         <div className="space-y-2">
-          <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+          <p className="text-xs font-medium uppercase tracking-wide text-[#6e6e73]">
             Sales volume range
           </p>
           <Slider
             value={salesRange}
-            min={3000}
+            min={300}
             max={16000}
-            step={100}
+            step={50}
             onValueChange={(value) => onSalesRangeChange(value as [number, number])}
           />
-          <p className="text-xs text-zinc-400">
+          <p className="text-xs text-[#6e6e73]">
             {formatNumber(salesRange[0])} - {formatNumber(salesRange[1])}
           </p>
         </div>

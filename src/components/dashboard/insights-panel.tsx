@@ -46,11 +46,11 @@ export function InsightsPanel({ models, isCollapsed, onToggle }: InsightsPanelPr
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-zinc-200">Quick Insights</h2>
+        <h2 className="text-sm font-semibold text-[#1d1d1f]">Quick Insights</h2>
         <button
           type="button"
           onClick={onToggle}
-          className="text-xs text-zinc-400 hover:text-zinc-200"
+          className="text-xs text-[#6e6e73] hover:text-[#1d1d1f]"
         >
           {isCollapsed ? "Expand" : "Collapse"}
         </button>
@@ -66,13 +66,13 @@ export function InsightsPanel({ models, isCollapsed, onToggle }: InsightsPanelPr
             <CardContent>
               {topSeller ? (
                 <div>
-                  <p className="text-sm font-medium">{topSeller.fullName}</p>
-                  <p className="mt-1 text-xs text-zinc-400">
+                  <p className="text-sm font-medium text-[#1d1d1f]">{topSeller.fullName}</p>
+                  <p className="mt-1 text-xs text-[#6e6e73]">
                     {formatNumber(topSeller.sales_volume)} deliveries
                   </p>
                 </div>
               ) : (
-                <p className="text-xs text-zinc-500">No data in current filter.</p>
+                <p className="text-xs text-[#8e8e93]">No data in current filter.</p>
               )}
             </CardContent>
           </Card>
@@ -85,13 +85,13 @@ export function InsightsPanel({ models, isCollapsed, onToggle }: InsightsPanelPr
             <CardContent>
               {bestValue ? (
                 <div>
-                  <p className="text-sm font-medium">{bestValue.fullName}</p>
-                  <p className="mt-1 text-xs text-zinc-400">
+                  <p className="text-sm font-medium text-[#1d1d1f]">{bestValue.fullName}</p>
+                  <p className="mt-1 text-xs text-[#6e6e73]">
                     {(bestValue.base_price_ils / bestValue.sales_volume).toFixed(2)} ILS per sale unit
                   </p>
                 </div>
               ) : (
-                <p className="text-xs text-zinc-500">No data in current filter.</p>
+                <p className="text-xs text-[#8e8e93]">No data in current filter.</p>
               )}
             </CardContent>
           </Card>
@@ -101,7 +101,7 @@ export function InsightsPanel({ models, isCollapsed, onToggle }: InsightsPanelPr
               <CardTitle>Market snapshot</CardTitle>
               <CardDescription>Aggregated metrics from visible models.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2 text-xs text-zinc-300">
+            <CardContent className="space-y-2 text-xs text-[#3a3a3c]">
               <p>
                 Average base price: <span className="font-medium">{formatCurrency(avgPrice)} ILS</span>
               </p>

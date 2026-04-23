@@ -59,10 +59,10 @@ export function SummaryCards({ models }: SummaryCardsProps) {
         <Card key={card.title}>
           <CardContent className="flex items-center justify-between p-4">
             <div>
-              <p className="text-xs text-zinc-400">{card.title}</p>
-              <p className="mt-1 text-lg font-semibold text-zinc-100">{card.value}</p>
+              <p className="text-xs text-[#6e6e73]">{card.title}</p>
+              <p className="mt-1 text-lg font-semibold text-[#111111]">{card.value}</p>
             </div>
-            <card.icon className="h-5 w-5 text-blue-400" />
+            <card.icon className="h-5 w-5 text-[#0071e3]" />
           </CardContent>
         </Card>
       ))}

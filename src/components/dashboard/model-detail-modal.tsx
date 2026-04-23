@@ -41,41 +41,41 @@ export function ModelDetailModal({
               </DialogDescription>
             </DialogHeader>
 
-            <div className="grid grid-cols-1 gap-3 text-sm text-zinc-300 sm:grid-cols-2">
-              <div className="rounded-md border border-zinc-800 bg-zinc-900 p-3">
-                <p className="text-xs text-zinc-500">Brand</p>
+            <div className="grid grid-cols-1 gap-3 text-sm text-[#3a3a3c] sm:grid-cols-2">
+              <div className="rounded-xl border border-[#e5e5ea] bg-[#fbfbfd] p-3">
+                <p className="text-xs text-[#8e8e93]">Brand</p>
                 <p className="mt-1 font-medium">{model.brand}</p>
               </div>
-              <div className="rounded-md border border-zinc-800 bg-zinc-900 p-3">
-                <p className="text-xs text-zinc-500">Model</p>
+              <div className="rounded-xl border border-[#e5e5ea] bg-[#fbfbfd] p-3">
+                <p className="text-xs text-[#8e8e93]">Model</p>
                 <p className="mt-1 font-medium">{model.model}</p>
               </div>
-              <div className="rounded-md border border-zinc-800 bg-zinc-900 p-3">
-                <p className="text-xs text-zinc-500">Length</p>
+              <div className="rounded-xl border border-[#e5e5ea] bg-[#fbfbfd] p-3">
+                <p className="text-xs text-[#8e8e93]">Length</p>
                 <p className="mt-1 font-medium">{formatNumber(model.length_mm)} mm</p>
               </div>
-              <div className="rounded-md border border-zinc-800 bg-zinc-900 p-3">
-                <p className="text-xs text-zinc-500">Base trim price</p>
+              <div className="rounded-xl border border-[#e5e5ea] bg-[#fbfbfd] p-3">
+                <p className="text-xs text-[#8e8e93]">Base trim price</p>
                 <p className="mt-1 font-medium">{formatNumber(model.base_price_ils)} ILS</p>
               </div>
-              <div className="rounded-md border border-zinc-800 bg-zinc-900 p-3">
-                <p className="text-xs text-zinc-500">Sales volume</p>
+              <div className="rounded-xl border border-[#e5e5ea] bg-[#fbfbfd] p-3">
+                <p className="text-xs text-[#8e8e93]">Sales volume</p>
                 <p className="mt-1 font-medium">{formatNumber(model.sales_volume)}</p>
               </div>
-              <div className="rounded-md border border-zinc-800 bg-zinc-900 p-3">
-                <p className="text-xs text-zinc-500">Body type</p>
+              <div className="rounded-xl border border-[#e5e5ea] bg-[#fbfbfd] p-3">
+                <p className="text-xs text-[#8e8e93]">Body type</p>
                 <p className="mt-1 font-medium">{model.body_type ?? "N/A"}</p>
               </div>
             </div>
 
             {model.notes ? (
-              <p className="rounded-md border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-200">
+              <p className="rounded-xl border border-[#ffd9b3] bg-[#fff7ed] p-3 text-xs text-[#9a3412]">
                 {model.notes}
               </p>
             ) : null}
 
             <div className="flex flex-wrap items-center gap-2">
-              <Button asChild variant="secondary" className="bg-zinc-800">
+              <Button asChild variant="secondary">
                 <a
                   href={model.cartube_catalog_url}
                   target="_blank"

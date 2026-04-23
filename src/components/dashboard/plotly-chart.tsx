@@ -10,18 +10,18 @@ import type { CarModel } from "@/lib/data";
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
 const FALLBACK_COLORS = [
-  "#3b82f6",
-  "#22c55e",
-  "#f97316",
-  "#eab308",
-  "#a855f7",
-  "#14b8a6",
-  "#ec4899",
-  "#f43f5e",
-  "#6366f1",
-  "#84cc16",
-  "#06b6d4",
-  "#fb923c",
+  "#0071e3",
+  "#34c759",
+  "#ff9500",
+  "#ffd60a",
+  "#5856d6",
+  "#64d2ff",
+  "#ff2d55",
+  "#30b0c7",
+  "#af52de",
+  "#5ac8fa",
+  "#ff9f0a",
+  "#00c7be",
 ];
 
 interface BubbleChartProps {
@@ -71,7 +71,7 @@ export function BubbleChart({
         text: brandModels.map((model) => model.fullName),
         textposition: "top center",
         textfont: {
-          color: "#f5f5f5",
+          color: "#1d1d1f",
           size: 11,
         },
         marker: {
@@ -80,10 +80,10 @@ export function BubbleChart({
           sizemin: sizeMin,
           size: brandModels.map((model) => model.sales_volume),
           color: brandColorMap.get(brand),
-          opacity: 0.82,
+          opacity: 0.86,
           line: {
             width: 1,
-            color: "rgba(255,255,255,0.4)",
+            color: "rgba(255,255,255,0.9)",
           },
         },
         hovertext: brandModels.map(
@@ -96,36 +96,35 @@ export function BubbleChart({
             `Powertrain: ${model.powertrain ?? "N/A"}`,
         ),
         customdata: brandModels.map((model) => model.fullName),
-        hovertemplate:
-          "%{hovertext}<extra></extra>",
+        hovertemplate: "%{hovertext}<extra></extra>",
       } satisfies Data;
     });
   }, [brandColorMap, models, selectedBrandSet, showLabels, bubbleScale]);
 
   const layout: Partial<Layout> = {
     autosize: true,
-    paper_bgcolor: "#111827",
-    plot_bgcolor: "#111827",
+    paper_bgcolor: "#ffffff",
+    plot_bgcolor: "#ffffff",
     font: {
-      color: "#e5e7eb",
+      color: "#1d1d1f",
       family: "var(--font-geist-sans)",
     },
     xaxis: {
       title: { text: "Vehicle Length (mm)" },
       range: [4400, 5100],
-      gridcolor: "rgba(255,255,255,0.08)",
-      zerolinecolor: "rgba(255,255,255,0.12)",
+      gridcolor: "rgba(15,23,42,0.08)",
+      zerolinecolor: "rgba(15,23,42,0.16)",
     },
     yaxis: {
       title: { text: "Base Trim Price (ILS)" },
       tickformat: ",",
-      gridcolor: "rgba(255,255,255,0.08)",
-      zerolinecolor: "rgba(255,255,255,0.12)",
+      gridcolor: "rgba(15,23,42,0.08)",
+      zerolinecolor: "rgba(15,23,42,0.16)",
     },
     hoverlabel: {
-      bgcolor: "#1f2937",
-      bordercolor: "#4b5563",
-      font: { color: "#f9fafb" },
+      bgcolor: "#ffffff",
+      bordercolor: "#d2d2d7",
+      font: { color: "#1d1d1f" },
     },
     legend: {
       title: { text: "Brands" },

@@ -54,19 +54,19 @@ export function DataTable({ models, onRowClick }: DataTableProps) {
   };
 
   const getSortIcon = (key: SortKey) => {
-    if (sortKey !== key) return <ArrowUpDown className="h-3.5 w-3.5 text-zinc-500" />;
+    if (sortKey !== key) return <ArrowUpDown className="h-3.5 w-3.5 text-[#8e8e93]" />;
     return sortDirection === "asc" ? (
-      <ArrowUp className="h-3.5 w-3.5 text-blue-400" />
+      <ArrowUp className="h-3.5 w-3.5 text-[#0071e3]" />
     ) : (
-      <ArrowDown className="h-3.5 w-3.5 text-blue-400" />
+      <ArrowDown className="h-3.5 w-3.5 text-[#0071e3]" />
     );
   };
 
   return (
-    <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/70">
+    <div className="overflow-hidden rounded-2xl border border-[#e5e5ea] bg-white/95 shadow-[0_12px_32px_rgba(15,23,42,0.08)]">
       <div className="max-h-[70vh] overflow-auto">
-        <table className="min-w-full divide-y divide-zinc-800 text-sm">
-          <thead className="sticky top-0 z-10 bg-zinc-950">
+        <table className="min-w-full divide-y divide-[#ececf1] text-sm">
+          <thead className="sticky top-0 z-10 bg-[#f5f5f7]">
             <tr>
               {[
                 ["brand", "Brand"],
@@ -79,12 +79,12 @@ export function DataTable({ models, onRowClick }: DataTableProps) {
               ].map(([key, label]) => (
                 <th
                   key={key}
-                  className="px-3 py-2 text-left text-xs font-semibold tracking-wide text-zinc-300"
+                  className="px-3 py-2 text-left text-xs font-semibold tracking-wide text-[#6e6e73]"
                 >
                   <button
                     type="button"
                     onClick={() => onSort(key as SortKey)}
-                    className="flex items-center gap-1 hover:text-white"
+                    className="flex items-center gap-1 hover:text-[#111111]"
                   >
                     <span>{label}</span>
                     {getSortIcon(key as SortKey)}
@@ -93,20 +93,20 @@ export function DataTable({ models, onRowClick }: DataTableProps) {
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-800">
+          <tbody className="divide-y divide-[#ececf1]">
             {sortedModels.map((model) => (
               <tr
                 key={model.fullName}
                 className={cn(
-                  "cursor-pointer hover:bg-zinc-800/70",
+                  "cursor-pointer hover:bg-[#f5f5f7]",
                   model.length_mm < 4400 || model.length_mm > 5100
                     ? "bg-amber-500/5"
                     : "",
                 )}
                 onClick={() => onRowClick(model)}
               >
-                <td className="px-3 py-2 text-zinc-200">{model.brand}</td>
-                <td className="px-3 py-2 text-zinc-100">{model.model}</td>
+                <td className="px-3 py-2 text-[#3a3a3c]">{model.brand}</td>
+                <td className="px-3 py-2 text-[#111111]">{model.model}</td>
                 <td className="px-3 py-2">{formatNumber(model.length_mm)}</td>
                 <td className="px-3 py-2">{formatNumber(model.base_price_ils)}</td>
                 <td className="px-3 py-2">{formatNumber(model.sales_volume)}</td>

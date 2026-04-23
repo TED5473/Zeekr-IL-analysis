@@ -33,10 +33,9 @@ export interface CarModel {
  * -------------------
  * - Source of truth is ONLY https://www.cartube.co.il/.
  * - Length + base price come from Cartube "מחירון רכב חדש" model/spec pages.
- * - Sales volume comes from Cartube delivery reports tagged "מסירות רכב חדש ישראל"
- *   (currently anchored to the 2025 year-end report below).
- * - One row = one model nameplate (not trim-level split).
- * - Keep only passenger models with length in [4400, 5100] mm.
+ * - Sales volume comes from Cartube delivery reports tagged "מסירות רכב חדש ישראל".
+ * - One row = one model nameplate (do not split by trims).
+ * - Bubble chart includes only models with length in [4400, 5100] mm.
  * - Exclude commercial vehicles, pickups, vans and trucks.
  *
  * MONTHLY / PERIODIC UPDATE PROCEDURE
@@ -45,23 +44,16 @@ export interface CarModel {
  * 2) For each tracked model, open the model family page and then a base-trim spec page.
  *    - Update base_price_ils to the model's current base trim price.
  *    - Update length_mm from the "מידות" section ("אורך (ס\"מ)") * 10.
- *    - Keep cartube_catalog_url pointing to the exact spec page used for extraction.
- * 3) Open latest delivery report article (example current source below) and update
- *    sales_volume for each model from a consistent period (full year preferred).
- *    - If a model is missing in top tables, either use another consistent Cartube
- *      table/monthly source or remove the model until consistent data exists.
+ *    - Keep cartube_catalog_url pointing to the exact page used for extraction.
+ * 3) Open latest delivery report article and update sales_volume from a consistent period.
+ *    - Prefer full-year model table values where available.
+ *    - If Cartube only provides brand-level totals for a requested model,
+ *      keep a transparent note and replace with model-level values once published.
  * 4) Validate constraints:
- *    - 4400 <= length_mm <= 5100
  *    - base_price_ils > 0
  *    - sales_volume > 0
  *    - fullName = `${brand} ${model}`
  * 5) Set DATA_UPDATED_AT and DATA_PERIOD_LABEL to the newly used period.
- *
- * IMPORTANT
- * ---------
- * The values below are built from Cartube model/spec pages and Cartube's 2025 summary
- * delivery report. Some models are very recent/facelifted, so refresh prices monthly
- * and confirm that the sales period remains methodologically consistent.
  */
 
 export const SALES_SOURCE_URL =
@@ -265,6 +257,131 @@ export const carModels: CarModel[] = [
     cartube_catalog_url:
       "https://www.cartube.co.il/מחירון-רכב-חדש/יונדאי/יונדאי-טוסון/6480-יונדאי-טוסון-1-6-טורבו-premium",
     cartube_sales_url: SALES_SOURCE_URL,
+  },
+  {
+    brand: "Tesla",
+    model: "Model Y",
+    fullName: "Tesla Model Y",
+    length_mm: 4790,
+    base_price_ils: 243160,
+    sales_volume: 4082,
+    body_type: "SUV",
+    powertrain: "EV",
+    cartube_catalog_url:
+      "https://www.cartube.co.il/מחירון-רכב-חדש/טסלה/טסלה-מודל-y",
+    cartube_sales_url: SALES_SOURCE_URL,
+  },
+  {
+    brand: "Tesla",
+    model: "Model 3",
+    fullName: "Tesla Model 3",
+    length_mm: 4720,
+    base_price_ils: 191592,
+    sales_volume: 1984,
+    body_type: "Sedan",
+    powertrain: "EV",
+    cartube_catalog_url:
+      "https://www.cartube.co.il/מחירון-רכב-חדש/טסלה/טסלה-מודל-3",
+    cartube_sales_url: SALES_SOURCE_URL,
+  },
+  {
+    brand: "Zeekr",
+    model: "X",
+    fullName: "Zeekr X",
+    length_mm: 4432,
+    base_price_ils: 186990,
+    sales_volume: 760,
+    body_type: "Crossover",
+    powertrain: "EV",
+    cartube_catalog_url:
+      "https://www.cartube.co.il/מחירון-רכב-חדש/זיקר/זיקר-x/6090-זיקר-x-הנעה-אחורית-272-כ-ס-beyond",
+    cartube_sales_url: SALES_SOURCE_URL,
+  },
+  {
+    brand: "Zeekr",
+    model: "7X",
+    fullName: "Zeekr 7X",
+    length_mm: 4787,
+    base_price_ils: 233990,
+    sales_volume: 706,
+    body_type: "SUV",
+    powertrain: "EV",
+    cartube_catalog_url:
+      "https://www.cartube.co.il/מחירון-רכב-חדש/זיקר/זיקר-7x",
+    cartube_sales_url: SALES_SOURCE_URL,
+  },
+  {
+    brand: "Zeekr",
+    model: "001",
+    fullName: "Zeekr 001",
+    length_mm: 4955,
+    base_price_ils: 283990,
+    sales_volume: 596,
+    body_type: "Liftback",
+    powertrain: "EV",
+    cartube_catalog_url:
+      "https://www.cartube.co.il/מחירון-רכב-חדש/זיקר/זיקר-001",
+    cartube_sales_url: SALES_SOURCE_URL,
+    notes:
+      "Sales volume derived as Zeekr residual (brand 2,062 minus Zeekr X 760 and Zeekr 7X 706) from the same 2025 Cartube report.",
+  },
+  {
+    brand: "Lynk & Co",
+    model: "02",
+    fullName: "Lynk & Co 02",
+    length_mm: 4460,
+    base_price_ils: 171900,
+    sales_volume: 2998,
+    body_type: "Crossover",
+    powertrain: "EV",
+    cartube_catalog_url:
+      "https://www.cartube.co.il/מחירון-רכב-חדש/לינק-אנד-קו/לינק-אנד-קו-02/6009-לינק-אנד-קו-02-pro",
+    cartube_sales_url: SALES_SOURCE_URL,
+  },
+  {
+    brand: "Lynk & Co",
+    model: "01",
+    fullName: "Lynk & Co 01",
+    length_mm: 4545,
+    base_price_ils: 179900,
+    sales_volume: 366,
+    body_type: "SUV",
+    powertrain: "PHEV",
+    cartube_catalog_url:
+      "https://www.cartube.co.il/מחירון-רכב-חדש/לינק-אנד-קו/לינק-אנד-קו-01/6228-לינק-אנד-קו-01-pro",
+    cartube_sales_url: SALES_SOURCE_URL,
+    notes:
+      "Sales proxy from Cartube 2025 report residual for non-02 Lynk & Co models (brand total 3,364 minus model 02 volume 2,998). Replace when model-specific figure is published.",
+  },
+  {
+    brand: "Lynk & Co",
+    model: "08",
+    fullName: "Lynk & Co 08",
+    length_mm: 4820,
+    base_price_ils: 229900,
+    sales_volume: 366,
+    body_type: "SUV",
+    powertrain: "PHEV",
+    cartube_catalog_url:
+      "https://www.cartube.co.il/מחירון-רכב-חדש/לינק-אנד-קו/לינק-אנד-קו-08",
+    cartube_sales_url: SALES_SOURCE_URL,
+    notes:
+      "Sales proxy from Cartube 2025 report residual for non-02 Lynk & Co models (brand total 3,364 minus model 02 volume 2,998). Replace when model-specific figure is published.",
+  },
+  {
+    brand: "Volvo",
+    model: "EX30",
+    fullName: "Volvo EX30",
+    length_mm: 4233,
+    base_price_ils: 179900,
+    sales_volume: 692,
+    body_type: "Crossover",
+    powertrain: "EV",
+    cartube_catalog_url:
+      "https://www.cartube.co.il/מחירון-רכב-חדש/וולוו/וולוו-ex30",
+    cartube_sales_url: SALES_SOURCE_URL,
+    notes:
+      "Volvo EX30 length is below bubble chart range (4400mm minimum), so it is stored in dataset but excluded from plotted bubbles.",
   },
 ];
 

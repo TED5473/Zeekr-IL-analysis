@@ -104,8 +104,8 @@ export function Dashboard() {
   const [selectedBrands, setSelectedBrands] = useState<string[]>(allBrands);
   const [selectedBodyTypes, setSelectedBodyTypes] = useState<string[]>(allBodyTypes);
   const [selectedPowertrains, setSelectedPowertrains] = useState<string[]>(allPowertrains);
-  const [priceRange, setPriceRange] = useState<[number, number]>([130000, 300000]);
-  const [salesRange, setSalesRange] = useState<[number, number]>([3000, 16000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([130000, 350000]);
+  const [salesRange, setSalesRange] = useState<[number, number]>([300, 16000]);
   const [searchTerm, setSearchTerm] = useState("");
 
   const [showLabels, setShowLabels] = useState(true);
@@ -165,8 +165,8 @@ export function Dashboard() {
     setSelectedBrands(allBrands);
     setSelectedBodyTypes(allBodyTypes);
     setSelectedPowertrains(allPowertrains);
-    setPriceRange([130000, 300000]);
-    setSalesRange([3000, 16000]);
+    setPriceRange([130000, 350000]);
+    setSalesRange([300, 16000]);
     setSearchTerm("");
   };
 
@@ -175,16 +175,16 @@ export function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100">
-      <header className="sticky top-0 z-20 border-b border-zinc-800 bg-zinc-950/95 backdrop-blur">
+    <div className="min-h-screen bg-[#f5f5f7] text-[#111111]">
+      <header className="sticky top-0 z-20 border-b border-[#e5e5ea] bg-[#fbfbfd]/95 backdrop-blur">
         <div className="mx-auto flex max-w-[1800px] items-center justify-between gap-4 px-4 py-3 md:px-6">
           <div className="flex items-center gap-3">
-            <div className="rounded-md bg-blue-600/90 p-2">
+            <div className="rounded-xl bg-[#0071e3] p-2 text-white shadow-sm">
               <BarChart3 className="h-5 w-5" />
             </div>
             <div>
               <p className="text-sm font-semibold md:text-base">Cartube Bubble Analyzer</p>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-[#6e6e73]">
                 Data from cartube.co.il - Updated {formatDate(DATA_UPDATED_AT)}
               </p>
             </div>
@@ -236,7 +236,7 @@ export function Dashboard() {
         <main className="space-y-4">
           <SummaryCards models={filteredModels} />
 
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-3">
+          <div className="rounded-2xl border border-[#e5e5ea] bg-white/95 p-3 shadow-[0_12px_32px_rgba(15,23,42,0.08)]">
             <div className="mb-3 flex flex-wrap items-center gap-2">
               <Button
                 variant={showLabels ? "default" : "secondary"}
@@ -272,7 +272,7 @@ export function Dashboard() {
                 <Download className="h-3.5 w-3.5" /> Export CSV
               </Button>
 
-              <div className="ml-auto flex items-center gap-1 rounded-md border border-zinc-700 bg-zinc-950 p-1">
+              <div className="ml-auto flex items-center gap-1 rounded-full border border-[#d2d2d7] bg-[#f5f5f7] p-1">
                 <Button
                   variant={viewMode === "chart" ? "default" : "ghost"}
                   size="sm"
