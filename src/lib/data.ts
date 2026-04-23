@@ -389,7 +389,18 @@ export const bubbleModels = carModels.filter(
   (model) => model.length_mm >= 4400 && model.length_mm <= 5100,
 );
 
-export type SalesPeriod = "month" | "quarter" | "year";
+export type SalesPeriod =
+  | "y2025"
+  | "y2026"
+  | "q1-2026"
+  | "q2-2026"
+  | "q3-2026"
+  | "q4-2026"
+  | "jan-2026"
+  | "feb-2026"
+  | "mar-2026";
+
+type SalesGranularity = "year" | "quarter" | "month";
 
 export interface ReportBrandDelivery {
   brand: string;
@@ -403,34 +414,92 @@ export interface ReportModelDelivery {
   source_table: "top-models" | "top-ev-models";
 }
 
-export const SALES_PERIOD_OPTIONS: { value: SalesPeriod; label: string; description: string }[] = [
+export const SALES_PERIOD_OPTIONS: {
+  value: SalesPeriod;
+  label: string;
+  description: string;
+  granularity: SalesGranularity;
+}[] = [
   {
-    value: "month",
-    label: "Month",
-    description: "Normalized monthly run-rate from 2025 annual totals",
+    value: "y2025",
+    label: "2025 Year",
+    description: "Actual full-year totals from the Cartube 2025 summary report",
+    granularity: "year",
   },
   {
-    value: "quarter",
-    label: "Quarter",
-    description: "Normalized quarterly run-rate from 2025 annual totals",
+    value: "y2026",
+    label: "2026 Year",
+    description: "Normalized annual scenario until full 2026 source report is published",
+    granularity: "year",
   },
   {
-    value: "year",
-    label: "Year",
-    description: "Full-year 2025 totals from Cartube report",
+    value: "q1-2026",
+    label: "Q1 2026",
+    description: "Normalized quarterly view from 2025 annual totals",
+    granularity: "quarter",
+  },
+  {
+    value: "q2-2026",
+    label: "Q2 2026",
+    description: "Normalized quarterly view from 2025 annual totals",
+    granularity: "quarter",
+  },
+  {
+    value: "q3-2026",
+    label: "Q3 2026",
+    description: "Normalized quarterly view from 2025 annual totals",
+    granularity: "quarter",
+  },
+  {
+    value: "q4-2026",
+    label: "Q4 2026",
+    description: "Normalized quarterly view from 2025 annual totals",
+    granularity: "quarter",
+  },
+  {
+    value: "jan-2026",
+    label: "Jan 2026",
+    description: "Normalized monthly view from 2025 annual totals",
+    granularity: "month",
+  },
+  {
+    value: "feb-2026",
+    label: "Feb 2026",
+    description: "Normalized monthly view from 2025 annual totals",
+    granularity: "month",
+  },
+  {
+    value: "mar-2026",
+    label: "Mar 2026",
+    description: "Normalized monthly view from 2025 annual totals",
+    granularity: "month",
   },
 ];
 
+function getSalesPeriodOption(period: SalesPeriod) {
+  return SALES_PERIOD_OPTIONS.find((option) => option.value === period) ?? SALES_PERIOD_OPTIONS[0];
+}
+
+export function getSalesPeriodLabel(period: SalesPeriod) {
+  return getSalesPeriodOption(period).label;
+}
+
+export function getSalesPeriodColumnKey(period: SalesPeriod) {
+  return getSalesPeriodLabel(period)
+    .toLowerCase()
+    .replaceAll(" ", "_")
+    .replaceAll("-", "_");
+}
+
 export function scaleAnnualDeliveries(value: number, period: SalesPeriod) {
-  if (period === "year") return value;
-  if (period === "quarter") return Math.max(1, Math.round(value / 4));
+  const granularity = getSalesPeriodOption(period).granularity;
+  if (granularity === "year") return value;
+  if (granularity === "quarter") return Math.max(1, Math.round(value / 4));
   return Math.max(1, Math.round(value / 12));
 }
 
 export function getPeriodDescriptor(period: SalesPeriod) {
-  if (period === "year") return "2025 full-year totals";
-  if (period === "quarter") return "2025 normalized quarterly run-rate";
-  return "2025 normalized monthly run-rate";
+  return `${getSalesPeriodOption(period).label}: ${getSalesPeriodOption(period).description}`;
 }
 
 /**

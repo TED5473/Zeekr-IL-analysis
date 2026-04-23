@@ -24,19 +24,22 @@ import {
   DATA_UPDATED_AT,
   SALES_PERIOD_OPTIONS,
   bubbleModels,
+  getSalesPeriodColumnKey,
+  getSalesPeriodLabel,
   scaleAnnualDeliveries,
   type CarModel,
   type SalesPeriod,
 } from "@/lib/data";
 
 function toCsv(models: CarModel[], salesPeriod: SalesPeriod) {
+  const salesPeriodKey = getSalesPeriodColumnKey(salesPeriod);
   const headers = [
     "brand",
     "model",
     "fullName",
     "length_mm",
     "base_price_ils",
-    `sales_${salesPeriod}`,
+    `sales_${salesPeriodKey}`,
     "sales_year",
     "body_type",
     "powertrain",
@@ -120,7 +123,7 @@ export function Dashboard() {
   const [viewMode, setViewMode] = useState<"chart" | "table">("chart");
   const [insightsCollapsed, setInsightsCollapsed] = useState(false);
   const [chartRevision, setChartRevision] = useState(0);
-  const [salesPeriod, setSalesPeriod] = useState<SalesPeriod>("year");
+  const [salesPeriod, setSalesPeriod] = useState<SalesPeriod>("y2025");
 
   const selectedBrandSet = useMemo(() => new Set(selectedBrands), [selectedBrands]);
 
@@ -291,6 +294,8 @@ export function Dashboard() {
                   </SelectContent>
                 </Select>
               </div>
+
+              <Badge variant="secondary">{getSalesPeriodLabel(salesPeriod)}</Badge>
 
               <Button
                 variant="outline"

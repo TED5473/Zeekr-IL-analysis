@@ -2,6 +2,7 @@
 
 import {
   getPeriodDescriptor,
+  getSalesPeriodLabel,
   reportBrandDeliveries2025,
   reportModelDeliveries2025,
   scaleAnnualDeliveries,
@@ -17,6 +18,7 @@ function formatNumber(value: number) {
 }
 
 export function ReportTables({ period }: ReportTablesProps) {
+  const periodLabel = getSalesPeriodLabel(period);
   const sortedBrands = [...reportBrandDeliveries2025].sort(
     (a, b) => b.deliveries_2025 - a.deliveries_2025,
   );
@@ -42,8 +44,12 @@ export function ReportTables({ period }: ReportTablesProps) {
               <thead className="sticky top-0 bg-[#f5f5f7]">
                 <tr>
                   <th className="px-3 py-2 text-left text-xs font-semibold text-[#6e6e73]">Brand</th>
-                  <th className="px-3 py-2 text-right text-xs font-semibold text-[#6e6e73]">{period}</th>
-                  <th className="px-3 py-2 text-right text-xs font-semibold text-[#6e6e73]">Year</th>
+                  <th className="px-3 py-2 text-right text-xs font-semibold text-[#6e6e73]">
+                    {periodLabel}
+                  </th>
+                  <th className="px-3 py-2 text-right text-xs font-semibold text-[#6e6e73]">
+                    2025 Year
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#ececf1]">
@@ -75,8 +81,12 @@ export function ReportTables({ period }: ReportTablesProps) {
                   <th className="px-3 py-2 text-left text-xs font-semibold text-[#6e6e73]">Model</th>
                   <th className="px-3 py-2 text-left text-xs font-semibold text-[#6e6e73]">Brand</th>
                   <th className="px-3 py-2 text-left text-xs font-semibold text-[#6e6e73]">Source</th>
-                  <th className="px-3 py-2 text-right text-xs font-semibold text-[#6e6e73]">{period}</th>
-                  <th className="px-3 py-2 text-right text-xs font-semibold text-[#6e6e73]">Year</th>
+                  <th className="px-3 py-2 text-right text-xs font-semibold text-[#6e6e73]">
+                    {periodLabel}
+                  </th>
+                  <th className="px-3 py-2 text-right text-xs font-semibold text-[#6e6e73]">
+                    2025 Year
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#ececf1]">
