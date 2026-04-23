@@ -19,17 +19,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toCanonicalBrandName } from "@/lib/brand-alias";
+import {
+  SALES_PERIOD_OPTIONS,
+  getSalesPeriodColumnKey,
+  getSalesPeriodLabel,
+  type SalesPeriod,
+  type SalesPeriodSnapshot,
+} from "@/lib/cartube-sales-types";
+import { createModelRowsLookup, findModelDeliveriesForCar } from "@/lib/model-alias";
 import {
   DATA_PERIOD_LABEL,
   DATA_UPDATED_AT,
-  SALES_PERIOD_OPTIONS,
   bubbleModels,
-  getSalesPeriodColumnKey,
-  getSalesPeriodLabel,
-  scaleAnnualDeliveries,
   type CarModel,
-  type SalesPeriod,
 } from "@/lib/data";
+
+interface DashboardProps {
+  salesByPeriod: Record<SalesPeriod, SalesPeriodSnapshot>;
+}
 
 function toCsv(models: CarModel[], salesPeriod: SalesPeriod) {
   const salesPeriodKey = getSalesPeriodColumnKey(salesPeriod);
@@ -40,7 +48,6 @@ function toCsv(models: CarModel[], salesPeriod: SalesPeriod) {
     "length_mm",
     "base_price_ils",
     `sales_${salesPeriodKey}`,
-    "sales_year",
     "body_type",
     "powertrain",
     "cartube_catalog_url",
@@ -54,7 +61,6 @@ function toCsv(models: CarModel[], salesPeriod: SalesPeriod) {
       model.fullName,
       model.length_mm,
       model.base_price_ils,
-      scaleAnnualDeliveries(model.sales_volume, salesPeriod),
       model.sales_volume,
       model.body_type ?? "",
       model.powertrain ?? "",
@@ -90,7 +96,13 @@ function withinRange(value: number, [min, max]: [number, number]) {
   return value >= min && value <= max;
 }
 
-export function Dashboard() {
+function salesRangeForPeriod(models: CarModel[]): [number, number] {
+  if (models.length === 0) return [0, 0];
+  const values = models.map((model) => model.sales_volume);
+  return [Math.min(...values), Math.max(...values)];
+}
+
+export function Dashboard({ salesByPeriod }: DashboardProps) {
   const allBrands = useMemo(
     () => Array.from(new Set(bubbleModels.map((model) => model.brand))).sort(),
     [],
@@ -114,7 +126,7 @@ export function Dashboard() {
   const [selectedBodyTypes, setSelectedBodyTypes] = useState<string[]>(allBodyTypes);
   const [selectedPowertrains, setSelectedPowertrains] = useState<string[]>(allPowertrains);
   const [priceRange, setPriceRange] = useState<[number, number]>([130000, 350000]);
-  const [salesRange, setSalesRange] = useState<[number, number]>([300, 16000]);
+  const [salesRange, setSalesRange] = useState<[number, number]>([0, 16000]);
   const [searchTerm, setSearchTerm] = useState("");
 
   const [showLabels, setShowLabels] = useState(true);
@@ -127,14 +139,30 @@ export function Dashboard() {
 
   const selectedBrandSet = useMemo(() => new Set(selectedBrands), [selectedBrands]);
 
-  const modelsForPeriod = useMemo(
-    () =>
-      bubbleModels.map((model) => ({
+  const periodSnapshot = salesByPeriod[salesPeriod];
+
+  const modelsForPeriod = useMemo(() => {
+    const brandMap = new Map(
+      periodSnapshot.brand_rows.map((row) => [toCanonicalBrandName(row.name), row.deliveries]),
+    );
+    const modelLookup = createModelRowsLookup(periodSnapshot.model_rows);
+
+    return bubbleModels.map((model) => {
+      const modelDeliveries = findModelDeliveriesForCar(model, modelLookup);
+      const brandDeliveries = brandMap.get(model.brand);
+
+      return {
         ...model,
-        sales_volume: scaleAnnualDeliveries(model.sales_volume, salesPeriod),
-      })),
-    [salesPeriod],
-  );
+        sales_volume: modelDeliveries ?? brandDeliveries ?? 0,
+        notes:
+          modelDeliveries !== null
+            ? model.notes
+            : `${model.notes ? `${model.notes} ` : ""}Model-level row unavailable for ${getSalesPeriodLabel(
+                salesPeriod,
+              )}; using brand total from Cartube period table.`,
+      };
+    });
+  }, [periodSnapshot, salesPeriod]);
 
   const filteredModels = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
@@ -186,12 +214,29 @@ export function Dashboard() {
     setSelectedBodyTypes(allBodyTypes);
     setSelectedPowertrains(allPowertrains);
     setPriceRange([130000, 350000]);
-    setSalesRange([300, 16000]);
+    setSalesRange(salesRangeForPeriod(modelsForPeriod));
     setSearchTerm("");
   };
 
   const exportCsv = () => {
     downloadCsv("israel-car-bubble-analyzer.csv", toCsv(filteredModels, salesPeriod));
+  };
+
+  const onPeriodChange = (period: SalesPeriod) => {
+    setSalesPeriod(period);
+
+    const brandMap = new Map(
+      salesByPeriod[period].brand_rows.map((row) => [toCanonicalBrandName(row.name), row.deliveries]),
+    );
+    const modelLookup = createModelRowsLookup(salesByPeriod[period].model_rows);
+
+    const periodModels = bubbleModels.map((model) => ({
+      ...model,
+      sales_volume:
+        findModelDeliveriesForCar(model, modelLookup) ?? brandMap.get(model.brand) ?? 0,
+    }));
+
+    setSalesRange(salesRangeForPeriod(periodModels));
   };
 
   return (
@@ -280,8 +325,8 @@ export function Dashboard() {
                 </Select>
               </div>
 
-              <div className="min-w-[170px]">
-                <Select value={salesPeriod} onValueChange={(value) => setSalesPeriod(value as SalesPeriod)}>
+              <div className="min-w-[220px]">
+                <Select value={salesPeriod} onValueChange={(value) => onPeriodChange(value as SalesPeriod)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Sales period" />
                   </SelectTrigger>
@@ -341,7 +386,7 @@ export function Dashboard() {
             )}
           </div>
 
-          <ReportTables period={salesPeriod} />
+          <ReportTables period={salesPeriod} snapshot={periodSnapshot} />
         </main>
 
         <aside className="xl:sticky xl:top-24 xl:h-fit">

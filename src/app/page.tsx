@@ -1,5 +1,8 @@
 import { Dashboard } from "@/components/dashboard/dashboard";
+import { getAllSalesPeriodSnapshots } from "@/lib/cartube-sales";
 
-export default function Home() {
-  return <Dashboard />;
+export default async function Home() {
+  const salesByPeriod = await getAllSalesPeriodSnapshots();
+
+  return <Dashboard salesByPeriod={salesByPeriod} />;
 }
