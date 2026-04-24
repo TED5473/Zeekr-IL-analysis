@@ -39,6 +39,11 @@ interface DashboardProps {
   salesByPeriod: Record<SalesPeriod, SalesPeriodSnapshot>;
 }
 
+interface RefreshState {
+  status: "idle" | "loading" | "success" | "error";
+  message: string;
+}
+
 function toCsv(models: CarModel[], salesPeriod: SalesPeriod) {
   const salesPeriodKey = getSalesPeriodColumnKey(salesPeriod);
   const headers = [
@@ -136,10 +141,15 @@ export function Dashboard({ salesByPeriod }: DashboardProps) {
   const [insightsCollapsed, setInsightsCollapsed] = useState(false);
   const [chartRevision, setChartRevision] = useState(0);
   const [salesPeriod, setSalesPeriod] = useState<SalesPeriod>("y2025");
+  const [liveSalesByPeriod, setLiveSalesByPeriod] = useState(salesByPeriod);
+  const [refreshState, setRefreshState] = useState<RefreshState>({
+    status: "idle",
+    message: "",
+  });
 
   const selectedBrandSet = useMemo(() => new Set(selectedBrands), [selectedBrands]);
 
-  const periodSnapshot = salesByPeriod[salesPeriod];
+  const periodSnapshot = liveSalesByPeriod[salesPeriod];
 
   const modelsForPeriod = useMemo(() => {
     const brandMap = new Map(
@@ -226,9 +236,9 @@ export function Dashboard({ salesByPeriod }: DashboardProps) {
     setSalesPeriod(period);
 
     const brandMap = new Map(
-      salesByPeriod[period].brand_rows.map((row) => [toCanonicalBrandName(row.name), row.deliveries]),
+      liveSalesByPeriod[period].brand_rows.map((row) => [toCanonicalBrandName(row.name), row.deliveries]),
     );
-    const modelLookup = createModelRowsLookup(salesByPeriod[period].model_rows);
+    const modelLookup = createModelRowsLookup(liveSalesByPeriod[period].model_rows);
 
     const periodModels = bubbleModels.map((model) => ({
       ...model,
@@ -237,6 +247,30 @@ export function Dashboard({ salesByPeriod }: DashboardProps) {
     }));
 
     setSalesRange(salesRangeForPeriod(periodModels));
+  };
+
+  const refreshSnapshots = async () => {
+    setRefreshState({ status: "loading", message: "Refreshing live data from Cartube..." });
+
+    try {
+      const response = await fetch("/api/sales-snapshots", { method: "GET" });
+      if (!response.ok) throw new Error(`Refresh failed with status ${response.status}`);
+
+      const payload = (await response.json()) as {
+        salesByPeriod: Record<SalesPeriod, SalesPeriodSnapshot>;
+      };
+
+      setLiveSalesByPeriod(payload.salesByPeriod);
+      setRefreshState({
+        status: "success",
+        message: `Refreshed successfully at ${new Date().toLocaleTimeString("en-GB")}`,
+      });
+    } catch (error) {
+      setRefreshState({
+        status: "error",
+        message: error instanceof Error ? error.message : "Refresh failed",
+      });
+    }
   };
 
   return (
@@ -350,6 +384,15 @@ export function Dashboard({ salesByPeriod }: DashboardProps) {
                 <RefreshCcw className="h-3.5 w-3.5" /> Reset zoom
               </Button>
 
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={refreshSnapshots}
+                disabled={refreshState.status === "loading"}
+              >
+                <RefreshCcw className="h-3.5 w-3.5" /> Refresh now
+              </Button>
+
               <Button variant="outline" size="sm" onClick={exportCsv}>
                 <Download className="h-3.5 w-3.5" /> Export CSV
               </Button>
@@ -370,6 +413,28 @@ export function Dashboard({ salesByPeriod }: DashboardProps) {
                   <Table2 className="h-3.5 w-3.5" /> Table
                 </Button>
               </div>
+            </div>
+
+            <div className="mb-3 flex flex-wrap items-center gap-3 rounded-xl border border-[#e5e5ea] bg-[#fbfbfd] px-3 py-2 text-xs text-[#6e6e73]">
+              <span>
+                Last synced:{" "}
+                <span className="font-semibold text-[#111111]">
+                  {new Date(periodSnapshot.scraped_at).toLocaleString("en-GB")}
+                </span>
+              </span>
+              {refreshState.message ? (
+                <span
+                  className={
+                    refreshState.status === "error"
+                      ? "text-[#b42318]"
+                      : refreshState.status === "success"
+                        ? "text-[#087443]"
+                        : "text-[#6e6e73]"
+                  }
+                >
+                  {refreshState.message}
+                </span>
+              ) : null}
             </div>
 
             {viewMode === "chart" ? (

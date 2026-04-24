@@ -257,9 +257,17 @@ const loaders: Record<SalesPeriod, () => Promise<SalesPeriodSnapshot>> = {
 const cache = new Map<SalesPeriod, { expiresAt: number; data: SalesPeriodSnapshot }>();
 const CACHE_TTL_MS = 15 * 60 * 1000;
 
-export async function getSalesPeriodSnapshot(period: SalesPeriod): Promise<SalesPeriodSnapshot> {
+interface SnapshotOptions {
+  forceRefresh?: boolean;
+}
+
+export async function getSalesPeriodSnapshot(
+  period: SalesPeriod,
+  options: SnapshotOptions = {},
+): Promise<SalesPeriodSnapshot> {
+  const { forceRefresh = false } = options;
   const current = cache.get(period);
-  if (current && current.expiresAt > Date.now()) return current.data;
+  if (!forceRefresh && current && current.expiresAt > Date.now()) return current.data;
 
   const data = await loaders[period]();
   cache.set(period, {
@@ -270,9 +278,12 @@ export async function getSalesPeriodSnapshot(period: SalesPeriod): Promise<Sales
   return data;
 }
 
-export async function getAllSalesPeriodSnapshots() {
+export async function getAllSalesPeriodSnapshots(options: SnapshotOptions = {}) {
   const entries = await Promise.all(
-    SALES_PERIOD_OPTIONS.map(async (option) => [option.value, await getSalesPeriodSnapshot(option.value)]),
+    SALES_PERIOD_OPTIONS.map(async (option) => [
+      option.value,
+      await getSalesPeriodSnapshot(option.value, options),
+    ]),
   );
 
   return Object.fromEntries(entries) as Record<SalesPeriod, SalesPeriodSnapshot>;
